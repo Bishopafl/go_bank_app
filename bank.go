@@ -5,12 +5,11 @@ import "fmt"
 func main() {
 	var accountBalance float64 = 1000.0
 
+	fmt.Println("-----------------------------")
+	fmt.Println("| Welcome to Adam's Go Bank! |")
+	fmt.Println("-----------------------------")
 	// let us loop through
-	for i := 0; i < 2; i++ {
-
-		fmt.Println("-----------------------------")
-		fmt.Println("| Welcome to Adam's Go Bank! |")
-		fmt.Println("-----------------------------")
+	for {
 		fmt.Println("What do you want to do?")
 		fmt.Println("1. Check Balance")
 		fmt.Println("2. Deposit Funds")
@@ -37,7 +36,8 @@ func main() {
 			// check the deposit amount
 			if depositAmount <= 0 {
 				fmt.Println("Invalid amount. Must be greater than 0.")
-				return
+				// return
+				continue
 			}
 
 			accountBalance += depositAmount // accountBalance = accountBalance + depositAmount
@@ -65,8 +65,10 @@ func main() {
 		} else {
 			fmt.Println("-----------------------------")
 			fmt.Println("Goodbye!")
+			break
 		}
-
 	}
+
+	fmt.Println("Thanks for choosing our bank!")
 
 }
