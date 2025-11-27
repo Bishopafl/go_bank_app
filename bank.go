@@ -1,9 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"os"
+	"strconv"
+)
+
+const accountBalanceFile = "balance.txt"
 
 func main() {
-	var accountBalance float64 = 1000.0
+	var accountBalance, err = getBalanceFromFile()
+
+	if err != nil {
+		fmt.Println("ERROR")
+		fmt.Println(err)
+		fmt.Println("----------")
+		panic(err) // this shows more details for error handling like where the line it died was and a better error message view
+	}
 
 	fmt.Println("-----------------------------")
 	fmt.Println("| Welcome to Adam's Go Bank! |")
@@ -22,12 +36,14 @@ func main() {
 
 		// This would usually be put inline - but this is here
 		// just to show the that this is possible in Go
-		wantsCheckBalance := choice == 1
+		checkBalance := 1
+		wantsDeposit := 2
+		wantsWithdraw := 3
 
-		// Let's check what the user input is
-		if wantsCheckBalance {
+		switch choice {
+		case checkBalance:
 			fmt.Println("Your balance is", accountBalance)
-		} else if choice == 2 {
+		case wantsDeposit:
 			fmt.Println("-----------------------------")
 			fmt.Print("Your Deposit: ")
 			var depositAmount float64
@@ -41,9 +57,11 @@ func main() {
 			}
 
 			accountBalance += depositAmount // accountBalance = accountBalance + depositAmount
+			writeBalanceToFile(accountBalance)
+
 			fmt.Println("Balance Updated! New Amount:", accountBalance)
 			fmt.Println("-----------------------------")
-		} else if choice == 3 {
+		case wantsWithdraw:
 			fmt.Println("-----------------------------")
 			fmt.Print("Your Withdrawl: ")
 			var withdrawAmount float64
@@ -52,23 +70,46 @@ func main() {
 			// withdraw functionality checks
 			if withdrawAmount <= 0 {
 				fmt.Println("Invalid amount. Must be greater than 0.")
-				return
+				continue
 			}
 
 			if withdrawAmount > accountBalance {
 				fmt.Println("Invalid amount. You cannot withdraw more than you have.")
-				return
+				continue
 			}
 
 			accountBalance -= withdrawAmount
+			writeBalanceToFile(accountBalance)
+
 			fmt.Println("Balance Updated! New Amount:", accountBalance)
-		} else {
+		default:
 			fmt.Println("-----------------------------")
 			fmt.Println("Goodbye!")
-			break
+			fmt.Println("Thanks for choosing our bank!")
+			return
 		}
 	}
 
-	fmt.Println("Thanks for choosing our bank!")
+}
 
+func writeBalanceToFile(balance float64) {
+	balanceText := fmt.Sprint(balance)
+	os.WriteFile(accountBalanceFile, []byte(balanceText), 0644) // text name, slice of bytes, permissions
+}
+
+func getBalanceFromFile() (float64, error) {
+	data, err := os.ReadFile(accountBalanceFile)
+
+	if err != nil {
+		return 1000, errors.New("failed to find balance file")
+	}
+
+	balanceText := string(data)
+	balance, err := strconv.ParseFloat(balanceText, 64)
+
+	if err != nil {
+		return 1000, errors.New("failed to parse stored balance value")
+	}
+
+	return balance, nil
 }
