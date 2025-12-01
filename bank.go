@@ -1,16 +1,15 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"os"
-	"strconv"
+
+	"example.com/bank/fileops"
 )
 
 const accountBalanceFile = "balance.txt"
 
 func main() {
-	var accountBalance, err = getFloatFromFile(accountBalanceFile)
+	var accountBalance, err = fileops.GetFloatFromFile(accountBalanceFile)
 
 	if err != nil {
 		fmt.Println("ERROR")
@@ -53,7 +52,7 @@ func main() {
 			}
 
 			accountBalance += depositAmount // accountBalance = accountBalance + depositAmount
-			writeFloatToFile(accountBalance, accountBalanceFile)
+			fileops.WriteFloatToFile(accountBalance, accountBalanceFile)
 
 			fmt.Println("Balance Updated! New Amount:", accountBalance)
 			fmt.Println("-----------------------------")
@@ -75,7 +74,7 @@ func main() {
 			}
 
 			accountBalance -= withdrawAmount
-			writeFloatToFile(accountBalance, accountBalanceFile)
+			fileops.WriteFloatToFile(accountBalance, accountBalanceFile)
 
 			fmt.Println("Balance Updated! New Amount:", accountBalance)
 		default:
@@ -86,26 +85,4 @@ func main() {
 		}
 	}
 
-}
-
-func writeFloatToFile(value float64, fileName string) {
-	valueText := fmt.Sprint(value)
-	os.WriteFile(accountBalanceFile, []byte(valueText), 0644) // text name, slice of bytes, permissions
-}
-
-func getFloatFromFile(fileName string) (float64, error) {
-	data, err := os.ReadFile(fileName)
-
-	if err != nil {
-		return 1000, errors.New("failed to find file")
-	}
-
-	valueText := string(data)
-	balance, err := strconv.ParseFloat(valueText, 64)
-
-	if err != nil {
-		return 1000, errors.New("failed to parse stored value")
-	}
-
-	return balance, nil
 }
